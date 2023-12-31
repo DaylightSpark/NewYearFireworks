@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Year Fireworks</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: #000;
+    }
+
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="fireworksCanvas"></canvas>
+
+  <script>
+    const canvas = document.getElementById('fireworksCanvas');
+    const ctx = canvas.getContext('2d');
+    const fireworks = [];
+
+    function Firework() {
+      this.x = Math.random() * canvas.width;
+      this.y = canvas.height;
+      this.radius = 2;
+      this.color = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`;
+      this.velocity = {
+        x: Math.random() * 3 - 1.5,
+        y: Math.random() * -15,
+      };
+      this.life = true;
+    }
+
+    Firework.prototype.draw = function() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+      ctx.fillStyle = this.color;
+      ctx.fill();
+    };
+
+    Firework.prototype.update = function() {
+      this.x += this.velocity.x;
+      this.y += this.velocity.y;
+
+      this.velocity.y += 0.2;
+
+      if (this.radius > 0.2) {
+        this.radius -= 0.1;
+      } else {
+        this.life = false;
+      }
+    };
+
+    function createFirework() {
+      const firework = new Firework();
+      fireworks.push(firework);
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (Math.random() < 0.03) {
+        createFirework();
+      }
+
+      for (let i = fireworks.length - 1; i >= 0; i--) {
+        fireworks[i].draw();
+        fireworks[i].update();
+
+        if (!fireworks[i].life) {
+          fireworks.splice(i, 1);
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    // Set canvas size to match the device screen size
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    // Re-adjust canvas size when the window is resized
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+
+    animate();
+  </script>
+</body>
+</html>
